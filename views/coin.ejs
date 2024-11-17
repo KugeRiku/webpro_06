@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>コイントス</title>
+</head>
+<body>
+    <p>あなたの予想は<%= your %>です．</p>
+    <p>実際の結果は<%= cpu %>です．</p>
+    <p>判定：<%= judgement %></p>
+    <p>現在<%= total %>回試行中<%= correct %>回正解しています．</p>
+    <hr>
+    <form action="/coin" method="get">
+        <input type="radio" name="select" id="select1" value="1" required>
+        <label for="select1">オモテ</label><br>
+        <input type="radio" name="select" id="select2" value="2">
+        <label for="select2">ウラ</label><br>
+        <input type="hidden" name="correct" value="<%= correct %>">
+        <input type="hidden" name="total" value="<%= total %>">
+        <input type="submit" value="ピィン……パシッ！">
+    </form>   
+</body>
+</html>

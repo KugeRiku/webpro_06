@@ -61,4 +61,44 @@ app.get("/janken", (req, res) => {
   res.render( 'janken', display );
 });
 
+app.get("/coin", (req, res) => {
+  const select = req.query.select === '1' ? 'オモテ' : 'ウラ'; 
+  let correct = Number(req.query.correct) || 0; 
+  let total = Number(req.query.total) || 0;     
+  console.log({ select, correct, total });
+  const num = Math.floor(Math.random() * 2 + 1);
+  let cpu = num === 1 ? 'オモテ' : 'ウラ';
+  
+  let judgement = '';
+  if (select === cpu) {
+    judgement = 'アタリ';
+    correct += 1;
+  } else {
+    judgement = 'ハズレ';
+  }
+  total += 1;
+
+  const display = {
+    your: select,
+    cpu: cpu,
+    judgement: judgement,
+    correct: correct,
+    total: total
+  };
+
+  res.render('coin', display);
+});
+
+app.get("/gacha", (req, res) => {
+  const num = Math.floor(Math.random() * 10 + 1);
+
+  let gacha = '';
+  if (num == 1) gacha = 'スーパーレア';
+  else if (num <= 4) gacha = 'レア';
+  else gacha = 'ノーマル';
+
+  res.render('gacha', { number: num, gacha: gacha });
+});
+
+
 app.listen(8080, () => console.log("Example app listening on port 8080!"));
