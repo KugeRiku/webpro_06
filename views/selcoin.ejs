@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>コイントス</title>
+</head>
+<body>
+    <p>あなたの予想は<%= your %>です．</p>
+    <p>実際の結果は<%= cpu %>です．</p>
+    <p>判定：<%= judgement %></p>
+    <p>現在<%= total %>回試行中<%= correct %>回正解しています．</p>
+    <hr>
+    <form action="/selcoin" method="get">
+        <label for="select">スライダーで選択してください：</label><br>
+        <input type="range" id="select" name="select" min="0" max="1" step="1" oninput="showValue(this.value)" required>
+        <span id="sliderValue">オモテ</span><br>
+        <input type="hidden" name="correct" value="<%= correct %>">
+        <input type="hidden" name="total" value="<%= total %>">
+        <input type="submit" value="ピィン……パシッ！">
+    </form>
+
+    <script>
+        function showValue(value) {
+            document.getElementById('sliderValue').textContent = value === "0" ? "オモテ" : "ウラ";
+        }
+    </script>
+</body>
+</html>
