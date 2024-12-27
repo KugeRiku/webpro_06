@@ -94,14 +94,27 @@ git push origin main
 1. ランダムな結果が表示され、正解数と試行数が更新される。
 
 
-## ファイル一覧
+## フローチャート
 ```mermaid
 flowchart TD;
-開始 --> 終了;
+
+start["開始"]
+checkRoute{"ルートは？"}
+setMessages1["メッセージ1とメッセージ2を設定 (ルート: /hello1)"]
+setMessages2["メッセージ1とメッセージ2を設定 (ルート: /hello2)"]
+renderShow["'show.ejs'を表示"]
+end["終了"]
+
+start --> checkRoute
+checkRoute -->|/hello1| setMessages1
+checkRoute -->|/hello2| setMessages2
+setMessages1 --> renderShow
+setMessages2 --> renderShow
+renderShow --> end
 ```
 
 ```mermaid
-flowchart TD;
+flowchart TD
 
 start["開始"];
 end1["終了"];
@@ -114,4 +127,21 @@ if -->|yes| win
 win --> end1
 if -->|no| loose
 loose --> end1
+```
+```
+flowchart TD
+
+start["開始"]
+checkRoute{"ルートは？"}
+setMessages1["メッセージ1: 'Hello world'<br>メッセージ2: 'Bon jour'"]
+setMessages2["メッセージ1: 'Hello world'<br>メッセージ2: 'Bon jour'"]
+renderShow["'show.ejs'を表示<br>greet1とgreet2を埋め込む"]
+end["終了"]
+
+start --> checkRoute
+checkRoute -->|/hello1| setMessages1
+checkRoute -->|/hello2| setMessages2
+setMessages1 --> renderShow
+setMessages2 --> renderShow
+renderShow --> end
 ```
