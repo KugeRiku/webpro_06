@@ -95,53 +95,118 @@ git push origin main
 
 
 ## フローチャート
+/hello1, /hello2について
 ```mermaid
-flowchart TD;
+flowchart TD
 
 start["開始"]
 checkRoute{"ルートは？"}
 setMessages1["メッセージ1とメッセージ2を設定 (ルート: /hello1)"]
 setMessages2["メッセージ1とメッセージ2を設定 (ルート: /hello2)"]
 renderShow["'show.ejs'を表示"]
-end["終了"]
+e["終了"]
 
 start --> checkRoute
 checkRoute -->|/hello1| setMessages1
 checkRoute -->|/hello2| setMessages2
 setMessages1 --> renderShow
 setMessages2 --> renderShow
-renderShow --> end
+renderShow --> e
 ```
-
+/iconについて
 ```mermaid
 flowchart TD
 
-start["開始"];
-end1["終了"];
-if{"条件に合うか"};
-win["勝ち"];
-loose["負け"];
-
-start --> if
-if -->|yes| win
-win --> end1
-if -->|no| loose
-loose --> end1
+start["開始"] --> setImage["画像ファイル名: './public/Apple_logo_black.svg'<br>代替テキスト: 'Apple Logo'"]
+setImage --> renderIcon["'icon.ejs'を表示<br>filenameとaltを埋め込む"]
+renderIcon --> end1["終了"]
 ```
-```
+/luckについて
+```mermaid
 flowchart TD
 
-start["開始"]
-checkRoute{"ルートは？"}
-setMessages1["メッセージ1: 'Hello world'<br>メッセージ2: 'Bon jour'"]
-setMessages2["メッセージ1: 'Hello world'<br>メッセージ2: 'Bon jour'"]
-renderShow["'show.ejs'を表示<br>greet1とgreet2を埋め込む"]
-end["終了"]
+start["開始"] --> generateRandom["1～6の乱数を生成"]
+generateRandom --> checkLuck{"乱数は？"}
+checkLuck -->|1| setGreatLuck["運勢: '大吉'"]
+checkLuck -->|2| setMediumLuck["運勢: '中吉'"]
+checkLuck -->|それ以外| setOtherLuck["運勢: ''"]
+setGreatLuck --> renderLuck
+setMediumLuck --> renderLuck
+setOtherLuck --> renderLuck
+renderLuck["'luck.ejs'を表示<br>luckとnumberを埋め込む"] --> end1["終了"]
+```
+/jankenについて
+```mermaid
+flowchart TD
 
-start --> checkRoute
-checkRoute -->|/hello1| setMessages1
-checkRoute -->|/hello2| setMessages2
-setMessages1 --> renderShow
-setMessages2 --> renderShow
-renderShow --> end
+start["開始"] --> getQuery["手（hand）、勝数（win）、試合数（total）を取得"]
+getQuery --> generateRandomJanken["1～3の乱数を生成"]
+generateRandomJanken --> determineCpu{"乱数は？"}
+determineCpu -->|1| setCpuGu["CPUの手: 'グー'"]
+determineCpu -->|2| setCpuChoki["CPUの手: 'チョキ'"]
+determineCpu -->|3| setCpuPa["CPUの手: 'パー'"]
+setCpuGu --> judgeResult
+setCpuChoki --> judgeResult
+setCpuPa --> judgeResult
+judgeResult{"手の判定"} -->|引き分け| setDraw["結果: '引き分け'"]
+judgeResult -->|勝ち| setWin["結果: '勝ち'<br>勝数を+1"]
+judgeResult -->|負け| setLose["結果: '負け'"]
+setDraw --> updateTotal
+setWin --> updateTotal
+setLose --> updateTotal
+updateTotal["試合数を+1"] --> renderJanken
+renderJanken["'janken.ejs'を表示<br>your, cpu, judgement, win, totalを埋め込む"] --> end1["終了"]
+```
+/coinについて
+```mermaid
+flowchart TD
+
+startCoin([開始])
+processCoinSelect["選択を取得<br>クエリから'オモテ'または'ウラ'"]
+processCoinRandom["ランダム値生成<br>1 or 2"]
+processCoinResult["結果判定<br>選択とランダム値を比較<br>'アタリ'または'ハズレ'"]
+updateCoinCounters["正解数と総試行数を更新"]
+renderCoin["'coin.ejs'をレンダリング"]
+endCoin([終了])
+
+startCoin --> processCoinSelect
+processCoinSelect --> processCoinRandom
+processCoinRandom --> processCoinResult
+processCoinResult --> updateCoinCounters
+updateCoinCounters --> renderCoin
+renderCoin --> endCoin
+```
+/gachaについて
+```mermaid
+flowchart TD
+
+startGacha([開始])
+processGachaRandom["ランダム値生成<br>1-10"]
+processGachaResult["結果判定<br>1: 'スーパーレア'<br>2-4: 'レア'<br>5-10: 'ノーマル'"]
+renderGacha["'gacha.ejs'をレンダリング"]
+endGacha([終了])
+
+startGacha --> processGachaRandom
+processGachaRandom --> processGachaResult
+processGachaResult --> renderGacha
+renderGacha --> endGacha
+```
+/selcoinについて
+```mermaid
+flowchart TD
+
+startSelcoin([開始])
+processSelcoinSelect["選択を取得<br>クエリから'オモテ'または'ウラ'"]
+processSelcoinRandom["ランダム値生成<br>0 or 1"]
+processSelcoinResult["結果判定<br>選択とランダム値を比較<br>'アタリ'または'ハズレ'"]
+updateSelcoinCounters["正解数と総試行数を更新"]
+renderSelcoin["'selcoin.ejs'をレンダリング"]
+endSelcoin([終了])
+
+startSelcoin --> processSelcoinSelect
+processSelcoinSelect --> processSelcoinRandom
+processSelcoinRandom --> processSelcoinResult
+processSelcoinResult --> updateSelcoinCounters
+updateSelcoinCounters --> renderSelcoin
+renderSelcoin --> endSelcoin
 ```
