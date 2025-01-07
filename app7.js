@@ -7,6 +7,7 @@ let bbs = [];  // 本来はDBMSを使用するが，今回はこの変数にデ�
 app.set('view engine', 'ejs');
 app.use("/public", express.static(__dirname + "/public"));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.get("/hello1", (req, res) => {
   const message1 = "Hello world";
@@ -103,6 +104,24 @@ app.post("/post", (req, res) => {
   // 本来はここでDBMSに保存する
   bbs.push( { name: name, message: message } );
   res.json( {number: bbs.length } );
+});
+
+app.post("/like", (req, res) => {
+  const postId = Number(req.body.id);
+  if (bbs[postId]) {
+      bbs[postId].likes = (bbs[postId].likes || 0) + 1;
+      res.json({ success: true, likes: bbs[postId].likes });
+  } else {
+      res.status(404).json({ success: false, message: "Post not found" });
+  }
+});
+
+app.post("/search", (req, res) => {
+  const keyword = req.body.keyword;
+  const results = bbs.filter((post) =>
+      post.name.includes(keyword) || post.message.includes(keyword)
+  );
+  res.json({ results });
 });
 
 app.listen(8080, () => console.log("Example app listening on port 8080!"));

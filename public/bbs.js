@@ -86,3 +86,97 @@ document.querySelector('#check').addEventListener('click', () => {
         }
     });
 });
+
+// lllllllllllll
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadPosts(); // ページ読み込み時に投稿をロード
+});
+
+function loadPosts(start = 0) {
+    const params = {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `start=${start}`,
+    };
+    fetch("/read", params)
+        .then((response) => response.json())
+        .then((response) => {
+            response.messages.forEach((post, id) => renderPost(post, start + id));
+            number += response.messages.length; // 読み込んだ投稿の数を更新
+        });
+}
+
+// 投稿表示時にいいねボタンを追加
+function renderPost(post, id) {
+    let cover = document.createElement("div");
+    cover.className = "cover";
+
+    let nameArea = document.createElement("span");
+    nameArea.className = "name";
+    nameArea.innerText = post.name;
+
+    let messageArea = document.createElement("span");
+    messageArea.className = "mes";
+    messageArea.innerText = post.message;
+
+    let likeButton = document.createElement("button");
+    likeButton.innerText = `👍 ${post.likes || 0}`;
+    likeButton.addEventListener("click", () => {
+        fetch("/like", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `id=${id}`,
+        })
+            .then((response) => response.json())
+            .then((response) => {
+                if (response.success) {
+                    likeButton.innerText = `👍 ${response.likes}`;
+                }
+            });
+    });
+
+    cover.appendChild(nameArea);
+    cover.appendChild(messageArea);
+    cover.appendChild(likeButton);
+
+    bbs.appendChild(cover);
+}
+
+// 検索機能
+document.querySelector("#search").addEventListener("click", () => {
+    const keyword = document.querySelector("#searchInput").value;
+    fetch("/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `keyword=${keyword}`,
+    })
+        .then((response) => response.json())
+        .then((response) => {
+            bbs.innerHTML = "";
+            response.results.forEach((post, id) => renderPost(post, id));
+        });
+});
+
+// 通知機能
+let lastCheckedNumber = 0;
+
+setInterval(() => {
+    fetch("/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    })
+        .then((response) => response.json())
+        .then((response) => {
+            const newPostsCount = response.number - lastCheckedNumber;
+            if (newPostsCount > 0) {
+                alert(`新しい投稿が ${newPostsCount} 件あります！`);
+                lastCheckedNumber = response.number; // 確認済みに更新
+            }
+        });
+}, 5000);
+
+document.querySelector("#check button").addEventListener("click", () => {
+    const start = number; // 現在表示している投稿数
+    loadPosts(start);
+});

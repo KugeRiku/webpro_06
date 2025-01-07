@@ -1,0 +1,295 @@
+\documentclass[uplatex,dvipdfmx]{jsarticle}
+
+\usepackage[uplatex,deluxe]{otf} % UTF
+\usepackage[noalphabet]{pxchfon} % must be after otf package
+\usepackage{stix2} %欧文＆数式フォント
+\usepackage[fleqn,tbtags]{mathtools} % 数式関連 (w/ amsmath)
+\usepackage{hira-stix} % ヒラギノフォント＆STIX2 フォント代替定義（Warning回避）
+\usepackage{listings}
+
+\begin{document}
+
+\title{webプログラミングレポート}
+\author{24G1052 久家力孔}
+\maketitle
+\section{ソースコード}
+https://github.com/KugeRiku/webpro\_06.git
+
+\section{利用者向け仕様書}
+
+\subsection{サービス概要}
+本サービスでは，ユーザーが名前とメッセージを入力し，掲示板に投稿することができる．
+また表1に記した，ユーザエクスペリエンスを向上させるための三つの追加機能がある．
+
+\begin{table}[ht]
+    \centering
+    \caption{本サービスにおける機能}
+    \begin{tabular}{|c|c|}
+        \hline
+        投稿の検索 & キーワードを基に投稿を検索し、関連する結果のみを表示する \\ \hline
+        新規投稿の通知 &  新しい投稿があれば通知する \\ \hline
+        「いいね」機能 & 自分が気に入った投稿に「いいね」ボタンを押すことができる \\ \hline
+    
+    \end{tabular}
+\end{table}
+
+\subsection{画面のレイアウト}
+表2に，本サービスの基本的な画面構成を記した．
+
+\begin{table}[ht]
+    \centering
+    \caption{画面のレイアウトについて}
+    \begin{tabular}{|c|c|}
+        \hline
+        投稿フォーム & ページ上部に、名前と新規投稿の入力欄、送信ボタンがある \\ \hline
+        投稿一覧 &  ページの左上部に表示されていく \\ \hline
+        検索バー & ページ中央部分に、検索したいキーワードの入力欄がある \\ \hline
+    
+    \end{tabular}
+\end{table}
+
+\subsection{サービス利用の流れ}
+メッセージを投稿するためには，名前と投稿したいメッセージを入力欄に入力する.
+そして入力欄の右部にある送信ボタンを押すことで、メッセージが掲示板に投稿される．
+投稿フォーム下部の投稿チェックボタンを押すことで，新しく投稿されたメッセージを確認することができる．
+検索バーにキーワードを入力してから検索ボタンを押すことで，入力したキーワードのみを含むメッセージを表示することが
+できる．
+
+\section{管理者向け仕様書}
+
+\subsection{サービス概要}
+この掲示板サービスは，Node.jsベースで構築されたWebアプリケーションであり，四つの主要機能が存在する．
+\begin{itemize}
+    \item ユーザーが投稿を送信、閲覧できる機能．
+    \item 投稿をキーワードで検索できる機能．
+    \item 新規投稿を通知する機能．
+    \item 各投稿に対して「いいね」を付けることができる機能．
+\end{itemize}
+
+\subsection{必要ソフトウェア}
+サービスを立ち上げるために以下のソフトウェアが必要である
+\begin{itemize}
+    \item Node.js
+    \item npm（Node.jsに同梱）
+    \item Google Chrome, Firefox, Safariのいずれか
+\end{itemize}
+
+\subsection{セットアップ手順}
+まず，プロジェクトのディレクトリに以下のファイルを配置する
+\begin{itemize}
+    \item app7.js（サーバースクリプト）
+    \item bbs.html（HTML構造ファイル）
+    \item bbs.js（クライアントサイドスクリプト）
+    \item bbs.css（スタイルシート）
+\end{itemize}
+
+次に依存ライブラリをインストールするため、以下のコマンドを実行する
+\begin{verbatim}
+npm install express ejs
+\end{verbatim}
+
+そして，以下のコマンドを実行してサーバーを起動する
+\begin{verbatim}
+node app7.js
+\end{verbatim}
+
+成功時，次のメッセージが表示される
+\begin{verbatim}
+Example app listening on port 8080!
+\end{verbatim}
+
+\section{開発者向け仕様書}
+
+\subsection{サービス概要}
+この掲示板サービスは，Node.jsベースで構築されたWebアプリケーションである．
+サーバーサイドではexpressフレームワークを利用してHTTPリクエストを処理し，
+クライアントサイドでは，JavaScriptによる投稿の送信，検索，通知機能を実現した．
+
+\subsection{サーバーサイド（\texttt{app7.js})の構造と変数の説明}
+変数について
+\begin{itemize}
+    \item \texttt{bbs}：配列形式で掲示板の投稿データを保持。投稿は例として以下のような構造を持つ
+    \begin{verbatim}
+    { name: "Riku", message: "Hello", likes: 3 }
+    \end{verbatim}
+    \item \texttt{app}：Expressのインスタンスを保持
+\end{itemize}
+
+投稿の送信 (\texttt{/post})
+\begin{itemize}
+    \item メソッド：POST
+    \item データ形式の名前：\texttt{application/x-www-form-urlencoded}
+    \item 送信データの具体例
+    \begin{verbatim}
+    name=Riku&message=Hello
+    \end{verbatim}
+    \item 説明：クライアントから送信された\texttt{name}と\texttt{message}をサーバーの掲示板データに追加
+    \item レスポンスデータの形式
+    \begin{itemize}
+        \item データ形式の名前：JSON
+        \item レスポンスデータの具体例
+        \begin{verbatim}
+        { "number": 3 }
+        \end{verbatim}
+        \item 説明：サーバーに保存されている投稿の総数（\texttt{number}）を返す
+    \end{itemize}
+\end{itemize}
+
+投稿の取得 (\texttt{/read})
+\begin{itemize}
+    \item メソッド：POST
+    \item データ形式の名前：\texttt{application/x-www-form-urlencoded}
+    \item 送信データの具体例
+    \begin{verbatim}
+    start=10
+    \end{verbatim}
+    \item 説明：\texttt{start}で指定したインデックス以降の投稿をサーバーから取得
+    \item レスポンスデータの形式
+    \begin{itemize}
+        \item データ形式の名前：JSON
+        \item レスポンスデータの具体例
+        \begin{verbatim}
+        {
+            "messages": [
+                { "name": "Riku", "message": "Hello", "likes": 3 },
+                { "name": "Sora", "message": "Hi there!", "likes": 0 }
+            ]
+        }
+        \end{verbatim}
+        \item 説明：取得された投稿データを配列として返す
+    \end{itemize}
+\end{itemize}
+
+新規投稿数の確認 (\texttt{/check})
+\begin{itemize}
+    \item メソッド：POST
+    \item データ形式の名前：\texttt{application/x-www-form-urlencoded}
+    \item 送信データ：なし
+    \item 説明：現在の投稿数を取得し、クライアントに通知
+    \item レスポンスデータの形式
+    \begin{itemize}
+        \item データ形式の名前：JSON
+        \item レスポンスデータの具体例
+        \begin{verbatim}
+        { "number": 15 }
+        \end{verbatim}
+        \item 説明：掲示板に存在する投稿の総数を返す
+    \end{itemize}
+\end{itemize}
+
+検索機能 (\texttt{/search})
+\begin{itemize}
+    \item メソッド：POST
+    \item データ形式の名前：\texttt{application/x-www-form-urlencoded}
+    \item 送信データの具体例
+    \begin{verbatim}
+    keyword=Hello
+    \end{verbatim}
+    \item 説明：指定された\texttt{keyword}を含む投稿を検索し、結果を返す
+    \item レスポンスデータの形式
+    \begin{itemize}
+        \item データ形式の名前：JSON
+        \item レスポンスデータの具体例
+        \begin{verbatim}
+        {
+            "results": [
+                { "name": "Riku", "message": "Hello", "likes": 3 }
+            ]
+        }
+        \end{verbatim}
+        \item 説明：\texttt{keyword}を含む投稿データを配列として返す
+    \end{itemize}
+\end{itemize}
+
+いいね機能 (\texttt{/like})
+\begin{itemize}
+    \item メソッド：POST
+    \item データ形式の名前：\texttt{application/x-www-form-urlencoded}
+    \item 送信データの具体例
+    \begin{verbatim}
+    id=0
+    \end{verbatim}
+    \item 説明：指定された投稿（\texttt{id}で識別）の「いいね」数をインクリメント
+    \item レスポンスデータの形式
+    \begin{itemize}
+        \item データ形式の名前：JSON
+        \item レスポンスデータの具体例
+        \begin{verbatim}
+        { "success": true, "likes": 4 }
+        \end{verbatim}
+        \item 説明：
+        \begin{itemize}
+            \item \texttt{success}：処理が成功したかを示す（\texttt{true}または\texttt{false}）。
+            \item \texttt{likes}：投稿の更新後の「いいね」数。
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+\subsection{クライアントサイド（\texttt{bbs.js})の構造と変数の説明}
+変数について
+\begin{itemize}
+    \item \texttt{number}：現在表示中の投稿数を管理
+    \item \texttt{lastCheckedNumber}：最後にチェックした投稿数を記録
+\end{itemize}
+
+主な関数とその役割
+\begin{itemize}
+    \item \texttt{renderPost(post, id)}：投稿データをHTML要素として生成し、掲示板に追加
+    \item \texttt{loadPosts(start)}：指定インデックス以降の投稿をサーバーから取得し、表示
+    \item \texttt{setInterval}：一定間隔で新規投稿数をチェックし、通知
+\end{itemize}
+
+\subsection{データのフロー}
+以下にクライアントからサーバーへのリクエストの処理フローを示す
+
+\begin{enumerate}
+    \item クライアントが\texttt{/post}エンドポイントにデータを送信（例：\texttt{name=Riku\&message=Hello}）
+    \item サーバーは\texttt{express.urlencoded}でデータを解析し、\texttt{req.body}に保存
+    \item \texttt{bbs.push()}を使い、投稿データを\texttt{bbs}配列に追加
+    \item 処理が成功すると、サーバーは投稿数（例：\texttt{\{"number": 3\}}）をJSON形式で返す
+\end{enumerate}
+
+同様に，\texttt{/read}，\texttt{/search}，\texttt{/like}などのエンドポイントも，リクエストデータを処理し，必要なレスポンスを生成する．
+
+\subsection{独自使用技術の概要と採用理由}
+\texttt{DOMContentLoaded}
+\begin{itemize}
+    \item \textbf{概要}：HTMLの解析が完了し、DOMツリーの読み込み完了後に発火するイベント
+    \item \textbf{採用理由}：HTML構造が準備されていない状態でスクリプトが実行されるエラーを防ぐため
+\end{itemize}
+
+\texttt{forEach}
+\begin{itemize}
+    \item \textbf{概要}：配列の各要素に対して、一つずつ処理を行うためのメソッド
+    \item \textbf{採用理由}：シンプルで可読性が高く、ループ処理を簡潔に記述できるため
+    \item \textbf{例}
+    \begin{verbatim}
+    response.messages.forEach((post, id) => renderPost(post, id));
+    \end{verbatim}
+\end{itemize}
+
+テンプレートリテラル（\texttt{\$\{response.likes\}}）
+\begin{itemize}
+    \item \textbf{概要}：バッククォート（\texttt{`}）で囲んだ文字列中に変数や式を埋め込む構文
+    \item \textbf{採用理由}：ボタンの表示内容を分かりやすく設定するため
+    \item \textbf{例（「いいね」の記号はpdfに表示されないので'b'で代用）}
+    \begin{verbatim}
+    likeButton.innerText = `b ${response.likes}`;
+    \end{verbatim}
+\end{itemize}
+
+\texttt{setInterval}
+\begin{itemize}
+    \item \textbf{概要}：一定時間ごとに指定した関数を繰り返し実行する
+    \item \textbf{採用理由}：リアルタイムでの新規投稿チェックを実現するため
+    \item \textbf{例}：
+    \begin{verbatim}
+    setInterval(() => {
+        fetch("/check", { method: "POST" })
+            .then((response) => response.json())
+            .then((data) => alert(`新しい投稿が ${data.number} 件あります`));
+    }, 5000);
+    \end{verbatim}
+\end{itemize}
+
+\end{document}
